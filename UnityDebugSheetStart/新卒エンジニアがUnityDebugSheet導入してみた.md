@@ -13,8 +13,7 @@ AM3ではこれまで**SRDebugger**というアセットでデバッグ機能を
 しかし...やがてSRDebuggerに対して、ある不満がチーム内で浮かび上がってきました。
 それは **「デバッグコマンドが増えすぎて凄く見づらい！」** というものです。
 
-![]()
-
+![srdebugger](https://raw.githubusercontent.com/kamahir0/TechArticle/master/UnityDebugSheetStart/IMG_7799.PNG)
 ﾐﾁｨ...
 
 ここまで多すぎると目当てのデバッグコマンドを見つけるのも一苦労ですね。
