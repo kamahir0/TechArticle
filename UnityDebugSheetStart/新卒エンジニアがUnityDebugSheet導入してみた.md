@@ -13,19 +13,19 @@ AM3ではこれまで**SRDebugger**というアセットでデバッグ機能を
 しかし...やがてSRDebuggerに対して、ある不満がチーム内で浮かび上がってきました。
 それは **「デバッグコマンドが増えすぎて凄く見づらい！」** というものです。
 
-![srdebugger](https://raw.githubusercontent.com/kamahir0/TechArticle/master/UnityDebugSheetStart/IMG_7799.PNG)
+![SRDebugger](https://raw.githubusercontent.com/kamahir0/TechArticle/master/UnityDebugSheetStart/IMG_7799.PNG)
 ﾐﾁｨ...
 
 ここまで多すぎると目当てのデバッグコマンドを見つけるのも一苦労ですね。
 そこで、今回導入することになったのが**UnityDebugSheet**です。
 
-![]()
+![UnityDebugSheet](https://raw.githubusercontent.com/kamahir0/TechArticle/master/UnityDebugSheetStart/IMG_7800.PNG)
 
 UnityDebugSheetはデバッグコマンドへのアクセスを階層式に格納するシステムを提供します。目当てのコマンドが見つけやすくなるので開発効率アップが期待できます。
 
 今回の記事は、そんなUnityDebugSheetを新卒エンジニアが導入してみた！というお話です。
 
-# UnityDebugSheetについて
+# 3つの概念
 UnityDebugSheetを使う上で知っておくべき3つの概念があります。
 それが
 
@@ -36,8 +36,14 @@ UnityDebugSheetを使う上で知っておくべき3つの概念があります�
 です。
 
 ## シート
+一番外側
 
 ## ページ
+複数のセルを持っている
+１つのシートに同時に表示されるのは１ページまで
 
 ## セル
+ページの中に縦に配置される
+ボタン、スイッチ、スライダーなど色々ある。自分で作れる
+
 
