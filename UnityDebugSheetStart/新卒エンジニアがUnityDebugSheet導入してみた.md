@@ -44,7 +44,7 @@ UnityDebugSheetを使う上で知っておくべき「セル」「ページ」�
 序論でも述べていますが、お目当ての機能にアクセスしやすいです。
 SRDebuggerは精々ボタンをやんわりグループ分けする程度しかできませんでしたが、UnityDebugSheetは階層式なので同じ画面中に並ぶボタンを絞れます。ﾐﾁｨ...なんて擬音とはオサラバです。
 またデバッグシートのセルには標準で、アイコンやサブテキストを付加する機能が用意されています。
-![Icon&SubText Ex](リンク)
+![UnityDebugSheet](https://raw.githubusercontent.com/kamahir0/TechArticle/master/UnityDebugSheetStart/IMG_7800.PNG)
 アイコンで分かりやすくできるのは勿論、サブテキストが意外に偉いです。
 サブテキストに簡単な説明を併記しておくだけで、初見のデバッグコマンドの機能やページリンクボタンのリンク先ページの特色が、それを使わずとも推測できるようになります。
 「『それを使うとどうなるか』が使うまでもなく分かる」ことは使い勝手を大きく左右します。
@@ -56,6 +56,7 @@ UnityDebugSheetにおいては、各ページクラスの'Initialize'関数内�
 
 例1　TimeScaleをスライドで調節するSliderセルと、ボタンタップで指定するPickerセル
 
+![増築ページ](https://raw.githubusercontent.com/kamahir0/TechArticle/master/UnityDebugSheetStart/IMG_7839.PNG)
 例2　増築デバッグコマンドにおいてInputFieldセルでIDを入力すると、Labelセルを更新してパーツ名を表示
 
 こういった凝ったデバッグ機能は従来であれば、専用ポップアップを作ってSRDebuggerにポップアップ呼び出しボタンを追加するような実装をしていたはずです。
