@@ -91,7 +91,30 @@ UnityDebugSheetが用意するページリンクボタンへの不満は先に�
 `AddPageLinlButton<TPage>(Text, SubText, icon, etc...);`
 
 ...のように関数を呼び出す必要があります。しかし、ページリンクボタンの情報くらいリンク先のクラスに持たせたい。<br>
-そのために``というアトリビュートを作ることにしました。<br>
+そのために`DebugPageAttribute`というアトリビュートを作ることにしました。<br>
+こんな感じです。
+
+```
+/// <summary>
+/// デバッグページに付けるアトリビュート
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, Inherited = true)]
+public class DebugPageAttribute : Attribute
+{
+    /// <summary> デバッグページのタイトル </summary>
+    public string Title { get; }
+
+    /// <summary> デバッグページのサブテキスト </summary>
+    public string SubText { get; }
+
+    public DebugPageAttribute(string title, string subText = null)
+    {
+        Title = title;
+        SubText = subText;
+    }
+}
+```
+
 これを駆使して、ページリンクボタンは
 
  * ボタンテキスト・サブテキストはアトリビュートから取得
@@ -115,9 +138,9 @@ UnityDebugSheetが用意するページリンクボタンへの不満は先に�
 
 ですので、そうしました。<br>
 
-具体的には、前項の``を継承した`Root...`アトリビュートと、リフレクションを活用しました。<br>
-ルートページもページには違いないので、初期化時には`AddPageLinlButton<TPage>`を呼んでページリンクを作るという基本は同じです。ただ、今回**具体的な`TPage`について呼びだしてはいません**。<br>
-アセンブリを取得し、「`Root...`アトリビュートを持った`AM3DebugPage`の派生クラス」をそれぞれ当てはめて`AddPageLinlButton<TPage>`を呼ぶという仕組みを作りました。<br>
+具体的には、前項の`DebugPageAttribute`を継承した`LinkFromRootAttribute`と、リフレクションを活用しました。<br>
+ルートページもページには違いないので、初期化時には`AddPageLinlButton<TPage>`を呼んでページリンクを作るという基本は同じです。ただ、今回**具体的な`TPage`についての呼びだし**は記述していません。<br>
+アセンブリを取得し、「`LinkFromRootAttribute`アトリビュートを持った`AM3DebugPage`の派生クラス」をそれぞれ当てはめて`AddPageLinlButton<TPage>`を呼ぶという仕組みを作りました。<br>
 
 また`Root...`アトリビュートはSortOrderというint型のフィールドを持っており、ルートページに並ぶリンクページボタンらはこの値でソートされます。
 これにより、ルートページ直下からリンクするページを追加したい場合は、ルートページ周辺のコードをいじる必要なしにページ追加ができます。
