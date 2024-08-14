@@ -150,6 +150,8 @@ private static void BindDataToAllySetting(VisualElement allySettingElement, Ally
 `SetValueWithoutNotify`メソッドは、UI要素に対して値をセットします。<br>
 `RegisterValueChangedCallback`メソッドは、UI側で入力内容が変化したときのコールバックを登録します。今回は見ての通り、newValueを対応する変数に代入しています。<br>
 
+これらの変数を用いてバトルのModel的なものを生成し、デバッグバトルボタンからバトルをModelで初期化するような感じになるかと思います。<br>
+
 # 入力内容の保存・復元
 最後に、ウィンドウの入力内容をセーブする仕組みを作ります。ウィンドウを開く度に・Unityを起動する度に、毎回ステータスを入力するのはダルすぎますからね。
 
