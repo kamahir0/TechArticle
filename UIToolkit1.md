@@ -1,4 +1,4 @@
-UI Toolkitにやや入門してみた【エディタ拡張】
+# UI Toolkitにちょっと入門してみた【エディタ拡張】
 
 最近UI Toolkitをいじっていまして、エディタウィンドウを作れるようになったのでまとめてみます。<br>
 今回やることの範囲としては以下のような感じです。<br>
@@ -42,7 +42,7 @@ public class DebugBattleSetting : EditorWindow
 ```
 
 `DebugBattleSetting`クラスは`EditorWindow`を継承しています。<br>
-`OnEnable`関数というのは、ウィンドウが開かれたときに呼び出される関数です。<br>
+`OnEnable`関数というのは、ウィンドウが開かれたときに呼び出される関数です（もちろんUnityエディタを起動したときにも）。<br>
 
 Unityエディタに戻り、この.csファイルを選択して、インスペクターから先ほどのuxmlをアタッチします。<br>
 今回のコードであれば、ツールバーから`Example / DebugBattleSetting`と選ぶことでウィンドウを出せるようになっているはずです。<br>
@@ -71,6 +71,14 @@ VisualElementは子にUI要素を持つことができて、LayoutGroupコンポ
 # バインディング
 まずは最初にコードを置いておきます。これを前項の`DebugBattleSetting`クラスに追加します。<br>
 ```
+public void OnEnable()
+{
+    VisualElement rootFromUXML = windowLayout.Instantiate();
+    rootVisualElement.Add(rootFromUXML);
+    
+    BindAllies(); // <--追加
+}
+
 [Serializable]
 public class AllySetting
 {
@@ -147,15 +155,99 @@ private static void BindDataToAllySetting(VisualElement allySettingElement, Ally
 `var currentHpElm = hpElm.Q<IntegerField>("Current");`のようにして、子のUI要素を取得しています。<br>
 
 あとは見ての通りです。<br>
-`SetValueWithoutNotify`メソッドは、UI要素に対して値をセットします。<br>
+`SetValueWithoutNotify`メソッドは、UI要素に対して変数の値をセットします。<br>
 `RegisterValueChangedCallback`メソッドは、UI側で入力内容が変化したときのコールバックを登録します。今回は見ての通り、newValueを対応する変数に代入しています。<br>
-
-これらの変数を用いてバトルのModel的なものを生成し、デバッグバトルボタンからバトルをModelで初期化するような感じになるかと思います。<br>
+`SetValueWithoutNotify`の方はコレなんの意味があんの？？と思われるかもしれません。こちらは、後述のセーブ機能と併せて効力を発揮します。<br>
+このバインディング処理よりも早いタイミングで、復元した値を変数に入れておくというワケですね。で、その値をセットすると。<br>
 
 # 入力内容の保存・復元
-最後に、ウィンドウの入力内容をセーブする仕組みを作ります。ウィンドウを開く度に・Unityを起動する度に、毎回ステータスを入力するのはダルすぎますからね。
+最後に、ウィンドウの入力内容をセーブする仕組みを作ります。ウィンドウを開く度 / Unityを起動する度に、毎回ステータスを入力するのはダルすぎますからね。<br>
+例によってまずはコードです。
+```
+public void OnEnable()
+{
+    VisualElement rootFromUXML = windowLayout.Instantiate();
+    rootVisualElement.Add(rootFromUXML);
+    
+    RestoreState(); // <--追加
+    BindAllies();
+}
 
+public void OnDisable()
+{
+    SaveState();
+}
 
+private const string AlliesSettingsKey = "DebugBattleSetting_AllySettings";
 
+/// <summary>
+/// ウィンドウ状態の保存（閉じるとき呼ばれる）
+/// </summary>
+private void SaveState()
+{
+    // AllySettingsの保存
+    var allySettingsData = new List<AllySetting>();
+    allySettingsData.AddRange(new[] { Ally0, Ally1, Ally2, Ally3 });
+    var alliesSettingData = new AlliesSettingData(){ Settings = allySettingsData };
 
-次回はListView
+    var allySettingsJson = JsonUtility.ToJson(alliesSettingData);
+    EditorPrefs.SetString(AlliesSettingsKey, allySettingsJson);
+}
+
+/// <summary>
+/// ウィンドウ状態の復元（開くとき呼ばれる）
+/// </summary>
+private void RestoreState()
+{
+    // AllySettingsの復元
+    if (EditorPrefs.HasKey(AlliesSettingsKey))
+    {
+        var allySettingsJson = EditorPrefs.GetString(AlliesSettingsKey);
+        var alliesSettingData = JsonUtility.FromJson<AlliesSettingData>(allySettingsJson);
+
+        Ally0 = alliesSettingData.Get(0);
+        Ally1 = alliesSettingData.Get(1);
+        Ally2 = alliesSettingData.Get(2);
+        Ally3 = alliesSettingData.Get(3);
+    }
+}
+
+/// <summary>
+/// データクラスのラッパー
+/// </summary>
+[Serializable]
+private class AlliesSettingData
+{
+    public List<AllySetting> Settings;
+
+    public AllySetting Get(int index)
+    {
+        return new AllySetting()
+        {
+            Name = Settings[index].Name,
+            Level = Settings[index].Level,
+            Hp = Settings[index].Hp,
+            MaxHp = Settings[index].MaxHp,
+            Atk = Settings[index].Atk,
+        };
+    }
+}
+```
+
+ウィンドウが開かれたときに呼ばれる`OnEnable`と対になる、ウィンドウが閉じられたときに呼ばれる`OnDisable`関数もあります。<br>
+`OnDisable`にて内容を保存する`SaveState`を呼び、`OnEnable`にて内容を復元する`RestoreState`を呼んでいますね。<br>
+
+エディタ限定ですが、Unityには`EditorPrefs`というありがた～～い機能が備わっています。string値をキーにして、Jsonを非常に簡単に読み書きできるのです。<br>
+今回の実装ではこの`EditorPrefs`で、ウィンドウの入力内容を保存・復元しています。<br>
+`AlliesSettingData`クラスをわざわざ用意しているのはJsonUtilityで変換するためです。あとはList<AllySetting>のようなコレクションだけでなく、パーティ共通で単一の非コレクションな値も追加したくなるかもしれませんし（所持金...とか。ペルソナなんかでは混乱すると所持金をバラまいたりとかありますね）。<br>
+そういうのも`AlliesSettingData`に含めれば一緒に復元できる、という。
+
+# 結言
+そんな感じで、ウィンドウの内容を保存できるようになりました。<br>
+「RPGのデバッグ用戦闘シーンを開始するエディタウィンドウ」ということですから、<br>
+後はこのデータを用いてバトルのModel的なのを生成し、そのModelでバトルを初期化して開始する...みたいな処理を作って、ボタンのコールバックに登録すればよい、と。<br>
+
+以上で、基本的なウィンドウの作り方にちょっと入門してみた話でした。<br>
+次回は超絶曲者のListViewについてです > < たいへん<br>
+
+ご精読ありがとうございました。
